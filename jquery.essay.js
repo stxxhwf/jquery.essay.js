@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.0
+   Ver 1.0.0.1
 */
 
 var Essay_box_id = 0;
@@ -28,7 +28,9 @@ var Essay_box_id = 0;
 				noWords: [],   //随记中不能包含的关键词
 				minId: 1,
 				maxId: 999999,
-				maxCount: 20, //每次最多加载大随记条数，如果还有未加载的，则显示一个“点此继续加载”
+				
+				maxCount: 20, //每次最多加载大随记条数，如果还有未加载的，则显示一个“点此继续加载”，jsonp环境下最多不超过100条。
+				allowLoadMore: true,  //如果把这项设为false,那就不会出现“点此继续加载”或“全部加载结束”的字样
 				
 			    miniDisplay: false,  //是否启用极简模式，在该模式下，不展示底部信息区，下面一组选项全部失效且按false处理
 				
@@ -100,6 +102,10 @@ var Essay_box_id = 0;
 				
 				//渲染随记条目
 				$t.find('.eu-loading').remove();
+				
+				if(typeof d != 'object'){
+					$t.append(option.stateText.error); return;
+				}
 				
 				if(d.success){
 					
@@ -244,6 +250,7 @@ var Essay_box_id = 0;
 							
 							if(v.comment.hasmore || option.jsonp ){
 							   var $more = $('<a/>').html('<button>查看更多评论</button>').attr({href:baseDomain + '/e/' + v.id , target: '_blank' });
+							   if(option.jsonp && v.comment.count==0) $more.html('<button>还没有评论，立刻去抢沙发！</button>'); 
 							   $('<div/>').addClass('eu-comment-more').append($more).appendTo($eu_comment);
 							}
 							
@@ -313,15 +320,17 @@ var Essay_box_id = 0;
 						
 				    });
 					
-					if(d.hasmore){
-						$t.append(option.stateText.prepare.clone(true));
-					}else{
-						$t.append(option.stateText.complete.clone(true));
+					if(option.allowLoadMore){
+					  if(d.hasmore){
+						  $t.append(option.stateText.prepare.clone(true));
+					  }else{
+						  $t.append(option.stateText.complete.clone(true));
+					  }
 					}
 					
 					//修改元素绑定的数据，实现向后加载
 					if(isNaN(option.offset)) option.offset=0;
-					option.offset += option.maxCount;
+					option.offset += d.count;
 					$t.data('option',option);
 					
 				}else{
@@ -380,7 +389,7 @@ var Essay_box_id = 0;
 			};
 			
 			if(option.jsonp == 'auto'){
-				option.jsonp = (location.hostname != 'www.ybusad.com') && (location.hostname != 'localhost') ;
+				option.jsonp = (location.hostname != 'www.ybusad.com') // && (location.hostname != 'localhost') ;
 			}
 			
 			//单独操作每个被选项
