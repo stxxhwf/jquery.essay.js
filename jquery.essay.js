@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.2
+   Ver 1.0.0.3
 */
 
 var Essay_box_id = 0;
@@ -41,6 +41,7 @@ var Essay_box_id = 0;
 				allowCheck: true,  //是否允许通过复选框选择随记
 				
 				drawBaike: true,  //是否在随记内容中渲染百科条目
+				drawEmoji: true,  //是否在随记内容中渲染Emoji表情为图片？需要引用emoji.css。
 				
 				autoLoad: false,  //是否在滑条接近页面底端时自动触发“点此继续加载”
 				
