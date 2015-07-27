@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.1
+   Ver 1.0.0.2
 */
 
 var Essay_box_id = 0;
@@ -16,7 +16,6 @@ var Essay_box_id = 0;
 				
 				sortType: "time/Id",   //默认按时间和编号排序，也可以按评论的条数"comment"、或者是不强制顺序"normal"排序
 				sortReverse: true,  //默认从按大到小排序
-				filterViewState: "public", //对随记的可见状态进行筛选。"public" "private" 或 "all"，站长设记
 				
 				essayIdList: [], //手动设置需要展示的随记ID，注意，若设置了此项，下面的一组随记筛选条件会全部失效
 				
@@ -26,7 +25,7 @@ var Essay_box_id = 0;
 				linkType: "and",  //确认关键词中的连接是按"and" 或者 "or"
 				places: [],  //地点筛选匹配，各地点只能用or连接
 				noWords: [],   //随记中不能包含的关键词
-				minId: 1,
+				minId: 2,
 				maxId: 999999,
 				
 				maxCount: 20, //每次最多加载大随记条数，如果还有未加载的，则显示一个“点此继续加载”，jsonp环境下最多不超过100条。
@@ -37,11 +36,13 @@ var Essay_box_id = 0;
 				showComments: true, //是否在存在评论的前提下自动展示评论
 				showCommentTip: true,  //是否在存在评论时显示评论概要
 				maxCommentsCount: 5, //最多展示评论的条数。如果还有未展示的就显示个“查看更多”，再引到随记详情页
-				autoLoad: false,  //是否在滑条接近页面底端时自动触发“点此继续加载”
 				showMap: true, //是否在随记中加载可能存在的GPS位置和地图，开启本项功能需要事先引用jQueryUI和百度地图API
 				showNear: false, //是否显示“查看前后随记”
-				drawBaike: true,  //是否在随记内容中渲染百科条目
 				allowCheck: true,  //是否允许通过复选框选择随记
+				
+				drawBaike: true,  //是否在随记内容中渲染百科条目
+				
+				autoLoad: false,  //是否在滑条接近页面底端时自动触发“点此继续加载”
 				
 				offset : 0,  //实现分页加载的关键，偏移量
 				
@@ -64,10 +65,10 @@ var Essay_box_id = 0;
 				//预调用百度地图的API
 				if($('#Essay_Map').length<=0){
 				   if(typeof window.BMap == 'undefined'){
-					   alert('百度地图API没有正确加载');
+					   console.log('百度地图API没有正确加载');
 					   option.showMap=false;
 				   }else if (typeof $.ui.dialog == 'undefined') {
-					   alert('地图功能依赖的jQueryUI对话框模块没有得到正确加载');
+					   console.log('地图功能依赖的jQueryUI对话框模块没有得到正确加载');
 					   option.showMap=false;
 				   }else{
 					   $('<div id="Essay_Map"><div id="eu-map-container"></div></div>').appendTo("body");
@@ -104,7 +105,7 @@ var Essay_box_id = 0;
 				$t.find('.eu-loading').remove();
 				
 				if(typeof d != 'object'){
-					$t.append(option.stateText.error); return;
+					$t.append(option.stateText.error.clone(true)); return;
 				}
 				
 				if(d.success){
@@ -365,8 +366,21 @@ var Essay_box_id = 0;
 						
 					}else{
 						
-						$.post('/essay/api/fetch.php',optdata,function(d){
-							Essay_Drawing($t.attr('id'),d);
+						$.ajax({
+							url: "/essay/api/fetch.php",
+							type: "POST",
+							data: optdata,
+							timeout: 10*1000,
+							dataType:"json",
+							complete: function(xhr,s){
+								if(s=='timeout' || s=='error'){
+									$t.find('.eu-loading').remove();
+									$t.append(option.stateText.error.clone(true));
+								}
+							},
+							success: function(d){
+								Essay_Drawing($t.attr('id'),d);
+							}
 						});
 							
 				    }
