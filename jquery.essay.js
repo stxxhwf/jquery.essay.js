@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.5
+   Ver 1.0.0.6
 */
 
 var Essay_box_id = 0;
@@ -120,12 +120,11 @@ var Essay_box_id = 0;
 						    $eu_information = $('<div/>').addClass('eu-information').appendTo($eu_item),
 							$eu_content = $('<div/>').addClass('eu-content').html(v.content).appendTo($eu_item);
 							
-						var $eu_id = $('<div/>').addClass('essay-ui eu-id').appendTo($eu_information);
+						var $eu_id = $('<div/>').addClass('essay-ui eu-id').click(function(){
+							window.open(baseDomain+ '/e/' + v.id);
+						}).appendTo($eu_information);
 						
 						if(v.private) $eu_id.addClass('eu-private');
-						if(d.manager) $eu_id.addClass('eu-manage').click(function(){
-							window.open('http://manage.ybusad.com/s/essay/item.php?id=' + v.id);
-						});
 						
 						if(v.private){
 							$eu_id.html('<span>S</span>'+v.id);
