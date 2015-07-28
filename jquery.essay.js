@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.3
+   Ver 1.0.0.5
 */
 
 var Essay_box_id = 0;
@@ -38,7 +38,7 @@ var Essay_box_id = 0;
 				maxCommentsCount: 5, //最多展示评论的条数。如果还有未展示的就显示个“查看更多”，再引到随记详情页
 				showMap: true, //是否在随记中加载可能存在的GPS位置和地图，开启本项功能需要事先引用jQueryUI和百度地图API
 				showNear: false, //是否显示“查看前后随记”
-				allowCheck: true,  //是否允许通过复选框选择随记
+				allowCheck: false,  //是否允许通过复选框选择随记
 				
 				drawBaike: true,  //是否在随记内容中渲染百科条目
 				drawEmoji: true,  //是否在随记内容中渲染Emoji表情为图片？需要引用emoji.css。
@@ -287,23 +287,21 @@ var Essay_box_id = 0;
 												v.userdes = xzw.uDes();
 												v.useraut = xzw.uAut();
 												v.portrait = '/user/portrait/' + v.usercode + '_m.jpg';
-												v.content = content.replace('<','&lt;').replace('>','&gt;');
+												v.content = content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;');
 												
 												var d = new Date();
-												var hour = d.getHours().toString();
-												if(hour.length==1) hour = '0' + hour;
-												var minu = d.getMinutes().toString();
-												if(minu.length==1) minu = '0' + minu;
+												var hour = (100+d.getHours()).toString().substr(1);
+												var minu = (100+d.getMinutes()).toString().substr(1);
 												
 												v.time = '今天 '+hour+':'+minu;
 												drawCommentItem(0,v);
 											}
-											$input.val('');i$b.removeAttr('disabled');
+											$input.val('');
 										}else{
 											alert(o.msg);
 											$input.focus();
 										}
-										
+										i$b.removeAttr('disabled');
 									});
 									
 									
