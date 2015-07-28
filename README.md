@@ -30,6 +30,7 @@
 				autoLoad: false,  
 				offset : 0, 
 				drawBaike: true,
+				drawEmoji: true,
 				jsonp: true, 
 				loadingText: '努力加载又加载中...',
 				prepareText: '点此继续加载',
