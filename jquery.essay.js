@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.1.0
+   Ver 1.0.0.8
 */
 
 var Essay_box_id = 0;
@@ -242,11 +242,6 @@ var Essay_box_id = 0;
 									
 									$eu_comment_information.append(' <span>'+v.time+'</span>');
 									
-									if( !option.jsonp || (typeof xzw == 'object' && xzw.uCode()!=''))
-										$('<a/>').attr('href','javascript:;').addClass('eu-comment-reply').html('回复').click(function(){
-										   $(this).parents('.eu-comment').find('input').val('回复 '+v.username+':').focus();
-										}).appendTo($eu_comment_information);
-									
 								}
 							
 							var $eu_comment_item_box = $('<div/>').addClass('eu-comment-item-box').appendTo($eu_comment);
@@ -254,13 +249,13 @@ var Essay_box_id = 0;
 								$.each(v.comment.items,drawCommentItem);
 							}
 							
-							if(v.comment.hasmore || option.jsonp || (typeof xzw == 'object' && xzw.uCode()=='') ){
+							if(v.comment.hasmore || option.jsonp ){
 							   var $more = $('<a/>').html('<button>查看更多评论</button>').attr({href:baseDomain + '/e/' + v.id , target: '_blank' });
 							   if(option.jsonp && v.comment.count==0) $more.html('<button>还没有评论，立刻去抢沙发！</button>'); 
 							   $('<div/>').addClass('eu-comment-more').append($more).appendTo($eu_comment);
 							}
 							
-							if(!option.jsonp && ((typeof xzw == 'object' && xzw.uCode().length>0) || typeof xzw == 'undefined')){
+							if(!option.jsonp){
 								var $eu_comment_add = $('<div/>').addClass('eu-comment-add').appendTo($eu_comment),
 									$eu_comment_post = $('<div/>').addClass('eu-comment-post').appendTo($eu_comment_add);
 									

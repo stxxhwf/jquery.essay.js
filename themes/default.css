@@ -39,7 +39,6 @@
 	border-top-width:0px;
 	border-bottom-right-radius:50px 20px;
 	padding:2px 0px 0px 5px;
-	cursor:pointer;
 	float:left;
 }
 
@@ -48,7 +47,11 @@
 	font-weight:bold;
 }
 
-.eu-id:hover{
+.eu-manage{
+	cursor:pointer;
+}
+
+.eu-id.eu-manage:hover{
 	opacity:0.8;
 }
 
@@ -81,11 +84,11 @@
 
 @font-face {
 	font-family: 'esy_iconfont';
-	src: url('../../../website/essay/font/iconfont.eot'); /* IE9*/
-	src: url('../../../website/essay/font/iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-url('../../../website/essay/font/iconfont.woff') format('woff'), /* chrome、firefox */
-url('../../../website/essay/font/iconfont.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
-url('../../../website/essay/essay/font/iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
+	src: url('http://www.ybusad.com/essay/font/iconfont.eot'); /* IE9*/
+	src: url('http://www.ybusad.com/essay/font/iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+	url('http://www.ybusad.com/essay/font/iconfont.woff') format('woff'), /* chrome、firefox */
+	url('http://www.ybusad.com/essay/font/iconfont.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+	url('http://www.ybusad.com/essay/font/iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
 }
 .eu-box i{
 	font-family:"esy_iconfont";
@@ -283,10 +286,6 @@ url('../../../website/essay/essay/font/iconfont.svg#iconfont') format('svg'); /*
 }
 .eu-comment-post button:hover{
 	background-color:#E5E5E5;
-}
-
-.eu-comment-reply{
-	margin-left:4px;
 }
 
 .eu-loading{
