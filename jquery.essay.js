@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.0.6
+   Ver 1.0.0.8
 */
 
 var Essay_box_id = 0;
@@ -62,7 +62,7 @@ var Essay_box_id = 0;
 			
 			this.html('');
 			
-			if(option.showMap){
+			if(option.showMap && option.miniDisplay==false){
 				//预调用百度地图的API
 				if($('#Essay_Map').length<=0){
 				   if(typeof window.BMap == 'undefined'){
@@ -137,7 +137,7 @@ var Essay_box_id = 0;
 						var $eu_place = $('<div/>').addClass('eu-place').appendTo($eu_information);
 						
 						if(v.place) $eu_place.append('<i>&#xe6e4;</i>'+v.place);
-						if(option.showMap && v.hasmap){
+						if(option.showMap && v.hasmap && option.miniDisplay==false){
 							$('<a/>').attr({href:'javascript:;',target:'_self'}).html('<i>&#xe65f;</i>查看精确位置').appendTo($eu_place).click(function(){
 								
 								//展示地图
@@ -295,7 +295,8 @@ var Essay_box_id = 0;
 												v.time = '今天 '+hour+':'+minu;
 												drawCommentItem(0,v);
 											}
-											$input.val('');
+											var $pb = $input.val('').parents('.eu-item').find('.eu-comment-button');
+											$pb.data('count',parseInt($pb.data('count'))+1);
 										}else{
 											alert(o.msg);
 											$input.focus();
