@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.1.1
+   Ver 1.0.2.0
 */
 
 var Essay_box_id = 0;
@@ -41,8 +41,10 @@ var Essay_box_id = 0;
         allowCheck: false,  //是否允许通过复选框选择随记
         
         drawBaike: true,  //是否在随记内容中渲染百科条目
-        drawEmoji: true,  //是否在随记内容中渲染Emoji表情为图片？需要引用emoji.css。
-        
+        drawEmoji: true,  //是否采用传统方案在随记内容中渲染Emoji表情？需要引用emoji.css。
+        drawEmojiImproved: false, //是否采用增强的Emoji渲染方案，需要引用emoji.js和存在相关表情库支持。注意如果这一项为true，上一项自动为false。
+        emojiPath: '/plugin/emoji-coocy/emoji/', //drawEmojiImproved需要的emoji表情图片所在的路径
+
         autoLoad: false,  //是否在滑条接近页面底端时自动触发“点此继续加载”
         
         offset : 0,  //实现分页加载的关键，偏移量
@@ -83,6 +85,17 @@ var Essay_box_id = 0;
            }
         }
       }
+
+      if(option.drawEmojiImproved){
+        if(typeof window.Emoji != 'undefined'){
+          option.drawEmoji = false;
+          Emoji.emojiPath = option.emojiPath;
+          if(option.jsonp) Emoji.emojiPath = "http://www.ybusad.com" + Emoji.emojiPath;
+        }else{
+          option.drawEmojiImproved = false;
+          console.log("渲染emoji需要的emoji插件没有正确加载");
+        }
+      }
       
       //最终渲染随记条目的函数
       window.Essay_Drawing = function(t,d){
@@ -118,15 +131,19 @@ var Essay_box_id = 0;
             
             var $eu_item = $('<div/>').addClass('essay-ui eu-item').appendTo($t),
                 $eu_information = $('<div/>').addClass('eu-information').appendTo($eu_item),
-              $eu_content = $('<div/>').addClass('eu-content').html(v.content).appendTo($eu_item);
+                $eu_content = $('<div/>').addClass('eu-content').html(v.content).appendTo($eu_item);
+
+            if(option.drawEmojiImproved){
+              $eu_content.emoji();
+            }
               
             var $eu_id = $('<div/>').addClass('essay-ui eu-id').click(function(){
               window.open(baseDomain+ '/e/' + v.id);
             }).appendTo($eu_information);
             
-            if(v.private) $eu_id.addClass('eu-private');
+            if(v['private']) $eu_id.addClass('eu-private');
             
-            if(v.private){
+            if(v['private']){
               $eu_id.html('<span>S</span>'+v.id);
             }else{
               $eu_id.html('#'+v.id);
@@ -194,22 +211,21 @@ var Essay_box_id = 0;
               }
               
               $('<div/>').addClass('essay-ui eu-comment-button').html('<i>&#xf0005;</i>' +
-                         (option.showComments ? (v.comment.count>0?"收起":"评论") : (v.comment.count>0? v.comment.count :"评论") ))
-                         .data('count',v.comment.count).appendTo($eu_bottom).click(function(){
+                        (option.showComments ? (v.comment.count>0?"收起":"评论") : (v.comment.count>0? v.comment.count :"评论") ))
+                        .data('count',v.comment.count).appendTo($eu_bottom)
+                        .click(function(){
                        
-                       var $c = $(this).parents('.eu-item').find('.eu-comment');
-                       if($c.is(":hidden")){
-                        $(this).html('<i>&#xf0005;</i>收起');
-                        $c.stop().slideDown(200);
-                        $c.find(':text').focus();
-                       }else{
-                          if($(this).data('count')>0)
-                          $(this).html('<i>&#xf0005;</i>'+$(this).data('count')); 
-                        else
-                          $(this).html('<i>&#xf0005;</i>评论'); 
-                        $c.stop().slideUp(200);
-                       }
-                       
+                          var $c = $(this).parents('.eu-item').find('.eu-comment');
+                          if($c.is(":hidden")){
+                            $(this).html('<i>&#xf0005;</i>收起');
+                            $c.stop().slideDown(200);
+                            $c.find(':text').focus();
+                          }else{
+                            if($(this).data('count')>0) $(this).html('<i>&#xf0005;</i>'+$(this).data('count')); 
+                            else $(this).html('<i>&#xf0005;</i>评论'); 
+
+                            $c.stop().slideUp(200);
+                          }
                     });
                      
               if(v.comment.tip && option.showCommentTip){
@@ -220,34 +236,34 @@ var Essay_box_id = 0;
               
               var drawCommentItem = function(i,v){
                   
-                  var $eu_comment_item = $('<div/>').addClass('eu-comment-item').appendTo($eu_comment_item_box),
-                      $eu_comment_portrait = $('<div/>').addClass('eu-comment-portrait').appendTo($eu_comment_item),
-                      $portrait = $('<img/>').attr({src:baseDomain + v.portrait,width:30,height:30,
-                                  onerror:"this.src='"+baseDomain+"/img/person.png'"});
-  
-                  $('<a/>').attr({href:baseDomain + '/u/'+v.usercode,'target':'_blank'})
-                           .append($portrait).appendTo($eu_comment_portrait);
-                  
-                  var $eu_comment_main = $('<div/>').addClass('eu-comment-main').appendTo($eu_comment_item),
-                      $eu_comment_information = $('<div/>').addClass('eu-comment-information').appendTo($eu_comment_main),
-                      $eu_comment_content = $('<div/>').addClass('eu-comment-content').html(v.content).appendTo($eu_comment_main);
-                  
-                  $('<a/>').attr({href:baseDomain + '/u/'+v.usercode,target:'_blank'}).html(v.username)
-                           .appendTo($eu_comment_information);
-                  
-                  if(v.useraut>1){
-                    $('<img/>').attr({src:baseDomain + '/user/img/v_'+v.useraut+'.png',width:12,title:v.userdes})
-                               .appendTo($eu_comment_information);
-                  }
-                  
-                  $eu_comment_information.append(' <span>'+v.time+'</span>');
-                  
-                  if(!option.jsonp || (typeof xzw == 'object' && xzw.uCode()!=''))
-                    $('<a/>').attr('href','javascript:;').addClass('eu-comment-reply').html('回复').click(function(){
-                       $(this).parents('.eu-comment').find('input').val('回复 '+v.username+':').focus();
-                    }).appendTo($eu_comment_information);
-                  
+                var $eu_comment_item = $('<div/>').addClass('eu-comment-item').appendTo($eu_comment_item_box),
+                    $eu_comment_portrait = $('<div/>').addClass('eu-comment-portrait').appendTo($eu_comment_item),
+                    $portrait = $('<img/>').attr({src:baseDomain + v.portrait,width:30,height:30,
+                                onerror:"this.src='"+baseDomain+"/img/person.png'"});
+
+                $('<a/>').attr({href:baseDomain + '/u/'+v.usercode,'target':'_blank'})
+                         .append($portrait).appendTo($eu_comment_portrait);
+                
+                var $eu_comment_main = $('<div/>').addClass('eu-comment-main').appendTo($eu_comment_item),
+                    $eu_comment_information = $('<div/>').addClass('eu-comment-information').appendTo($eu_comment_main),
+                    $eu_comment_content = $('<div/>').addClass('eu-comment-content').html(v.content).appendTo($eu_comment_main);
+                
+                $('<a/>').attr({href:baseDomain + '/u/'+v.usercode,target:'_blank'}).html(v.username)
+                         .appendTo($eu_comment_information);
+                
+                if(v.useraut>1){
+                  $('<img/>').attr({src:baseDomain + '/user/img/v_'+v.useraut+'.png',width:12,title:v.userdes})
+                             .appendTo($eu_comment_information);
                 }
+                
+                $eu_comment_information.append(' <span>'+v.time+'</span>');
+                
+                if(!option.jsonp || (typeof xzw == 'object' && xzw.uCode()!=''))
+                  $('<a/>').attr('href','javascript:;').addClass('eu-comment-reply').html('回复').click(function(){
+                    $(this).parents('.eu-comment').find('input').val('回复 '+v.username+':').focus();
+                  }).appendTo($eu_comment_information);
+                  
+              }
               
               var $eu_comment_item_box = $('<div/>').addClass('eu-comment-item-box').appendTo($eu_comment);
               if(v.comment.count>0){
