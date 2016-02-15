@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.2.0
+   Ver 1.0.2.2
 */
 
 var Essay_box_id = 0;
@@ -252,7 +252,7 @@ var Essay_box_id = 0;
                          .appendTo($eu_comment_information);
                 
                 if(v.useraut>1){
-                  $('<img/>').attr({src:baseDomain + '/user/img/v_'+v.useraut+'.png',width:12,title:v.userdes})
+                  $('<img/>').attr({src:baseDomain + '/user/img/v_'+v.useraut+'.png',width:12})
                              .appendTo($eu_comment_information);
                 }
                 
@@ -304,9 +304,11 @@ var Essay_box_id = 0;
                         var v = new Object;
                         v.username = xzw.uName();
                         v.usercode = xzw.uCode();
-                        v.userdes = xzw.uDes();
-                        v.useraut = xzw.uAut();
-                        v.portrait = '/user/portrait/' + v.usercode + '_m.jpg';
+                        if(window.localStorage){
+                          v.useraut = localStorage.uAut || 0;
+                        }
+                        v.userdes = "";
+                        v.portrait = '/user/portrait/medium/' + v.usercode + '.jpg';
                         v.content = content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;');
                         
                         var d = new Date();
@@ -328,18 +330,17 @@ var Essay_box_id = 0;
                   
                 }).appendTo($eu_comment_post);
                 
-                $input = $('<input/>').attr({type:"text",placeholder:"我也说一句...",maxlength:240,autocomplete:"off"}).keydown(function(){
-                  if(event.keyCode == 13){
-                     $(this).parent().parent().find('button').click();
-                    }
-                  });
+                $input = $('<input/>').attr({type:"text",placeholder:"我也说一句...",maxlength:240,autocomplete:"off"}).keydown(function(e){
+                  if(e.which == 13){
+                    $(this).parent().parent().find('button').click();
+                  }
+                });
                 
                 $('<div/>').addClass('eu-comment-input-box').append($input).appendTo($eu_comment_add);
               }
-              } 
+            }
             
-            
-            });
+          });
           
           if(option.allowLoadMore){
             if(d.hasmore){
