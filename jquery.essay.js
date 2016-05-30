@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.2.2
+   Ver 1.0.3.0
 */
 
 var Essay_box_id = 0;
@@ -70,7 +70,7 @@ var Essay_box_id = 0;
            if(typeof window.BMap == 'undefined'){
              console.log('百度地图API没有正确加载');
              option.showMap=false;
-           }else if (typeof $.ui.dialog == 'undefined') {
+           }else if (typeof $.ui == 'undefined' || typeof $.ui.dialog == 'undefined') {
              console.log('地图功能依赖的jQueryUI对话框模块没有得到正确加载');
              option.showMap=false;
            }else{
@@ -103,7 +103,7 @@ var Essay_box_id = 0;
         //d -- 服务器接口返回的json随记数据
         
         $t = $('#'+t);
-        //$t就是当前渲染到的essay=ui-box
+        //$t就是当前渲染到的essay-ui-box
         
         if($t.length<=0) {
           alert('未指定随记渲染容器');return;
@@ -158,18 +158,17 @@ var Essay_box_id = 0;
               $('<a/>').attr({href:'javascript:;',target:'_self'}).html('<i>&#xe65f;</i>查看精确位置').appendTo($eu_place).click(function(){
                 
                 //展示地图
-                 var jd = parseFloat(v.longitude), wd = parseFloat(v.latitude);
-                 if(jd > 120){jd += 0.013; wd += 0.00815; } else {jd += 0.0122; wd += 0.0031;}
+                var jd = parseFloat(v.longitude), wd = parseFloat(v.latitude);
+                if(jd > 120){jd += 0.013; wd += 0.00815; } else {jd += 0.0122; wd += 0.0031;}
                  
-                 eu_map.reset();
-                 eu_map.clearOverlays(); 
-                 eu_map.setCenter(new BMap.Point(jd, wd));
-                 eu_map.panBy(300,250);
-                 eu_map.addOverlay(new BMap.Marker(new BMap.Point(jd, wd)));
-                 eu_map.addOverlay(new BMap.Circle(new BMap.Point(jd, wd),50,
-                                   {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.1}));
+                eu_map.reset();
+                eu_map.clearOverlays(); 
+                eu_map.setCenter(new BMap.Point(jd, wd));
+                eu_map.panBy(300,250);
+                eu_map.addOverlay(new BMap.Marker(new BMap.Point(jd, wd)));
+                eu_map.addOverlay(new BMap.Circle(new BMap.Point(jd, wd),50,{strokeColor:"blue", strokeWeight:2, strokeOpacity:0.1}));
                            
-                 $("#Essay_Map").dialog({modal:true,width:600,height:500,title:"查看精确位置 - #"+v.id ,show:200,hide:200});
+                $("#Essay_Map").dialog({modal:true,width:600,height:500,title:"查看精确位置 - #"+v.id ,show:200,hide:200});
                  
               });
             }
@@ -191,19 +190,23 @@ var Essay_box_id = 0;
               
               //渲染bottom
               var $eu_source = $('<div/>').addClass('eu-source').appendTo($eu_bottom);
-              switch(v.source){
-                case 'Android客户端':
-                  $eu_source.html( '<i>&#xe617;</i>' + v.source);break;
-                case 'iPhone客户端':
-                  $eu_source.html( '<i>&#xe6d6;</i>' + v.source);break;
-                case '网页客户端':
-                  $eu_source.html( '<i>&#xe60b;</i>' + v.source);break;
-                case 'PC客户端':
-                  $eu_source.html( '<i>&#xe624;</i>' + v.source);break;
-                case '网页':
-                  $eu_source.html( '<i>&#xe7cd;</i>' + v.source);break;
-                default:
-                  $eu_source.html( '<i>&#xe693;</i>' + v.source);
+              if(v.model){
+                $eu_source.html( '<i>&#xe617;</i>' + v.model);
+              }else{
+                switch(v.source){
+                  case 'Android客户端':
+                    $eu_source.html( '<i>&#xe617;</i>' + v.source);break;
+                  case 'iPhone客户端':
+                    $eu_source.html( '<i>&#xe6d6;</i>' + v.source);break;
+                  case '网页客户端':
+                    $eu_source.html( '<i>&#xe60b;</i>' + v.source);break;
+                  case 'PC客户端':
+                    $eu_source.html( '<i>&#xe624;</i>' + v.source);break;
+                  case '网页':
+                    $eu_source.html( '<i>&#xe7cd;</i>' + v.source);break;
+                  default:
+                    $eu_source.html( '<i>&#xe693;</i>' + v.source);
+                }
               }
               
               if(v.hidden){
@@ -247,6 +250,10 @@ var Essay_box_id = 0;
                 var $eu_comment_main = $('<div/>').addClass('eu-comment-main').appendTo($eu_comment_item),
                     $eu_comment_information = $('<div/>').addClass('eu-comment-information').appendTo($eu_comment_main),
                     $eu_comment_content = $('<div/>').addClass('eu-comment-content').html(v.content).appendTo($eu_comment_main);
+
+                if(option.drawEmojiImproved){
+                  $eu_comment_content.emoji();
+                }
                 
                 $('<a/>').attr({href:baseDomain + '/u/'+v.usercode,target:'_blank'}).html(v.username)
                          .appendTo($eu_comment_information);
@@ -404,9 +411,9 @@ var Essay_box_id = 0;
               }
             });
               
-            }
+          }
           
-          }else{
+        }else{
           $(this).parent().html('加载终止性失败');
         }
       }
