@@ -1,7 +1,7 @@
 /*
    骁之屋随记展示API
    这是一个jQuery插件
-   Ver 1.0.3.0
+   Ver 1.0.4.0
 */
 
 var Essay_box_id = 0;
@@ -37,6 +37,7 @@ var Essay_box_id = 0;
         showCommentTip: true,  //是否在存在评论时显示评论概要
         maxCommentsCount: 5, //最多展示评论的条数。如果还有未展示的就显示个“查看更多”，再引到随记详情页
         showMap: true, //是否在随记中加载可能存在的GPS位置和地图，开启本项功能需要事先引用jQueryUI和百度地图API
+        baiduMapAK: "tbGD4My5tUN6uLbDGDE34ydg", //如果附加百度map的ak，可以取得精度更高的地理坐标显示
         showNear: false, //是否显示“查看前后随记”
         allowCheck: false,  //是否允许通过复选框选择随记
         
@@ -68,10 +69,10 @@ var Essay_box_id = 0;
         //预调用百度地图的API
         if($('#Essay_Map').length<=0){
            if(typeof window.BMap == 'undefined'){
-             console.log('百度地图API没有正确加载');
+             console.error('百度地图API没有正确加载');
              option.showMap=false;
            }else if (typeof $.ui == 'undefined' || typeof $.ui.dialog == 'undefined') {
-             console.log('地图功能依赖的jQueryUI对话框模块没有得到正确加载');
+             console.error('地图功能依赖的jQueryUI对话框模块没有得到正确加载');
              option.showMap=false;
            }else{
              $('<div id="Essay_Map"><div id="eu-map-container"></div></div>').appendTo("body");
@@ -93,7 +94,7 @@ var Essay_box_id = 0;
           if(option.jsonp) Emoji.emojiPath = "http://www.ybusad.com" + Emoji.emojiPath;
         }else{
           option.drawEmojiImproved = false;
-          console.log("渲染emoji需要的emoji插件没有正确加载");
+          console.error("渲染emoji需要的emoji插件没有正确加载");
         }
       }
       
@@ -106,7 +107,7 @@ var Essay_box_id = 0;
         //$t就是当前渲染到的essay-ui-box
         
         if($t.length<=0) {
-          alert('未指定随记渲染容器');return;
+          alert('未指定随记渲染容器'); return;
         }
         
         var option = $t.data('option');
@@ -159,15 +160,28 @@ var Essay_box_id = 0;
                 
                 //展示地图
                 var jd = parseFloat(v.longitude), wd = parseFloat(v.latitude);
+                // http://api.map.baidu.com/geoconv/v1/?coords=114.21892734521,29.575429778924&from=1&to=5&ak=tbGD4My5tUN6uLbDGDE34ydg&callback=abc
+                var bdReqUrl = "http://api.map.baidu.com/geoconv/v1/?coords="+v.longitude + "," + v.latitude
+                    + "&from=1&to=5&ak=" + option.baiduMapAK + "&callback=adjustMap" + v.id;
+
+                window["adjustMap"+v.id] = function(result){
+                  if(result.status != 0) return;
+                  var jds = result.result[0].x,
+                      wds = result.result[0].y;
+                  eu_map.clearOverlays();
+                  eu_map.addOverlay(new BMap.Marker(new BMap.Point(jds, wds)));
+                  eu_map.addOverlay(new BMap.Circle(new BMap.Point(jds, wds), 20, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.1}));
+                }
+
                 if(jd > 120){jd += 0.013; wd += 0.00815; } else {jd += 0.0122; wd += 0.0031;}
-                 
                 eu_map.reset();
-                eu_map.clearOverlays(); 
+                eu_map.clearOverlays();
                 eu_map.setCenter(new BMap.Point(jd, wd));
                 eu_map.panBy(300,250);
                 eu_map.addOverlay(new BMap.Marker(new BMap.Point(jd, wd)));
                 eu_map.addOverlay(new BMap.Circle(new BMap.Point(jd, wd),50,{strokeColor:"blue", strokeWeight:2, strokeOpacity:0.1}));
-                           
+
+                $('<script/>').attr({'src':bdReqUrl, 'async': true}).appendTo('head');  
                 $("#Essay_Map").dialog({modal:true,width:600,height:500,title:"查看精确位置 - #"+v.id ,show:200,hide:200});
                  
               });
