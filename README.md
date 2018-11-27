@@ -1,4 +1,4 @@
-# jquery.essay.js
+# jquery.essay.js（已弃用）
 ## 强大的天骁随记展示jQuery插件
 
 以前我调用随记，不仅要处理一大堆逻辑，而且功能少，有够麻烦。
