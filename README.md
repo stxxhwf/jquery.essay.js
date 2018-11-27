@@ -43,6 +43,7 @@
 查看Demo:
 [http://www.ybusad.com/essay/demo.html](http://www.ybusad.com/essay/demo.html)
 
-**（本插件已经在2018年8月份弃用）**
 欢迎访问我的个人网站:
 [http://www.ybusad.com/](http://www.ybusad.com/)
+
+**（本插件已经在2018年8月份弃用）**
